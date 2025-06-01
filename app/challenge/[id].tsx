@@ -3,57 +3,58 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { CustomButton } from "@/components/button/Button";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Challenge } from "@/shared/type/challenge.type";
+import { useCurrentUser } from "@/context/CurrentUserContext";
+import { useSelectedChallenge } from "@/context/SelectedChallengeContext";
 import { renderChallengeIcon } from "@/shared/utilities/renderChallengeIcon";
+import { useRouter } from "expo-router";
 
-const mockDetail: Challenge = {
-  id: 2,
-  name: "Walking Challenge",
-  type: "walking",
-  reward: {
-    sui: 0.02,
-    badge: "Walking badge",
-  },
-  location: {
-    name: "Van Lang University",
-    coordinate: {
-      latitude: 10.8022,
-      longitude: 106.6565,
-    },
-  },
-  target: 5,
-  participantFee: 0.002,
-};
 export default function ChallengeScreen() {
+  const user = useCurrentUser();
+  const router = useRouter();
+  const challenge = useSelectedChallenge();
   return (
     <View style={styles.modal}>
       <IconSymbol
-        name={renderChallengeIcon(mockDetail?.type)}
+        name={renderChallengeIcon(
+          challenge.selectedChallenge?.type || "walking"
+        )}
         color="#4ca2ff"
         size={56}
       />
       <Text style={{ fontWeight: "bold", fontSize: 28, marginTop: 20 }}>
-        {mockDetail?.name}
+        {challenge.selectedChallenge?.name}
       </Text>
-      <Text style={{ fontSize: 16 }}>{mockDetail?.location?.name}</Text>
+      <Text style={{ fontSize: 16 }}>
+        {challenge.selectedChallenge?.location?.name}
+      </Text>
       <Text style={{ marginTop: 30 }}>
         You&apos;ll earn{" "}
-        <Text style={styles.reward}>{mockDetail?.reward?.sui} SUI</Text> and{" "}
-        <Text style={styles.badgeReward}>{mockDetail?.reward?.badge}</Text> when
-        you completed this challenge!
+        <Text style={styles.reward}>
+          {challenge.selectedChallenge?.reward?.sui} SUI
+        </Text>{" "}
+        and{" "}
+        <Text style={styles.badgeReward}>
+          {challenge.selectedChallenge?.reward?.badge}
+        </Text>{" "}
+        when you completed this challenge!
       </Text>
 
       <Text style={{ marginTop: 10 }}>
         You need to spend{" "}
-        <Text style={styles.spend}>{mockDetail.participantFee} SUI</Text> to
-        join this challenge.
+        <Text style={styles.spend}>
+          {challenge.selectedChallenge?.participantFee} SUI
+        </Text>{" "}
+        to join this challenge.
       </Text>
 
       <View style={{ marginTop: 40 }}>
         <CustomButton
           title="Join challenge"
           variant="primary"
-          onPress={() => alert("Joined!")}
+          onPress={() => {
+            user.joinChallenge(challenge.selectedChallenge);
+            router.push("/");
+          }}
           width={250}
           height={46}
         />

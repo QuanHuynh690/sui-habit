@@ -25,20 +25,23 @@ export const myUser: CurrentUser = {
       progress: 2.4,
     },
     {
-      id: 2,
-      name: "Walking Challenge",
-      type: "walking",
+      id: 3,
+      name: "Evening Meditation",
+      type: "meditation",
       reward: {
-        sui: 0.02,
-        badge: "Walking badge",
+        sui: 0.01,
+        badge: "Meditation badge",
       },
       location: {
-        name: "Van Lang University",
-        coordinate: { latitude: 10.8022, longitude: 106.6565 },
+        name: "Duoc Su Pagoda",
+        coordinate: {
+          latitude: 10.7992,
+          longitude: 106.6649,
+        },
       },
-      target: 5,
-      participantFee: 0.002,
-      progress: 3.5,
+      target: 60,
+      participantFee:0.001,
+      progress: 2.4,
     },
   ],
 };

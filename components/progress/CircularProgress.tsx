@@ -6,7 +6,7 @@ import Svg, { Circle } from "react-native-svg";
 import { IconSymbol } from "../ui/IconSymbol";
 
 type Props = {
-  progress: number;
+  progress?: number;
   target: number;
   radius?: number;
   strokeWidth?: number;
@@ -14,7 +14,7 @@ type Props = {
 };
 
 const CircularProgress = ({
-  progress,
+  progress = 0,
   target,
   radius = 15,
   strokeWidth = 2,

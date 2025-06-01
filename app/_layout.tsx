@@ -10,6 +10,7 @@ import "react-native-reanimated";
 
 import Header from "@/components/header/Header";
 import { CurrentUserProvider } from "@/context/CurrentUserContext";
+import { SelectedChallengeProvider } from "@/context/SelectedChallengeContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { getTitleFromPath } from "@/shared/utilities/getTitleFromPath";
 
@@ -29,27 +30,29 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <CurrentUserProvider>
-        <Stack
-          screenOptions={{
-            header: () => (
-              <Header isBackable title={getTitleFromPath(pathname)} />
-            ),
-            headerTitleStyle: {
-              fontSize: 24,
-              fontWeight: "bold",
-            },
-          }}
-        >
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
+        <SelectedChallengeProvider>
+          <Stack
+            screenOptions={{
+              header: () => (
+                <Header isBackable title={getTitleFromPath(pathname)} />
+              ),
+              headerTitleStyle: {
+                fontSize: 24,
+                fontWeight: "bold",
+              },
             }}
-          />
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="challenge/[id]" />
-        </Stack>
-        <StatusBar style="auto" />
+          >
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="challenge/[id]" />
+          </Stack>
+          <StatusBar style="auto" />
+        </SelectedChallengeProvider>
       </CurrentUserProvider>
     </ThemeProvider>
   );

@@ -11,7 +11,7 @@ interface CardProps {
   image?: string;
   actionButton?: () => void;
   actionIcon?: ReactElement;
-  progress: number;
+  progress?: number;
   target: number;
   type: ChallengeType;
 }

@@ -3,14 +3,13 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
-  Modal,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 
 import MapScreen from "@/components/map-view/MapView";
+import { useSelectedChallenge } from "@/context/SelectedChallengeContext";
 import { challenges } from "@/shared/mocks/challenges";
 import { Challenge } from "@/shared/type/challenge.type";
 import { haversineDistance } from "@/shared/utilities/map";
@@ -19,7 +18,7 @@ export default function ChallengeScreen() {
   const [location, setLocation] =
     useState<Location.LocationObjectCoords | null>(null);
   const [nearby, setNearby] = useState<Challenge[]>([]);
-  const [selectedMarker, setSelectedMarker] = useState<any>(null);
+  const selectedChallenge= useSelectedChallenge()
   const router = useRouter();
 
   useEffect(() => {
@@ -56,53 +55,15 @@ console.log(location);
         location={location}
         nearby={nearby}
         onSelectMarker={(challenge) =>
+        {
+          selectedChallenge.setSelectedChallenge(challenge)
           router.push({
             pathname: "/challenge/[id]",
             params: { id: challenge.id },
           })
         }
+        }
       />
-      <Modal visible={!!selectedMarker} transparent animationType="slide">
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#00000066",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View style={styles.modal}>
-            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-              {selectedMarker?.name}
-            </Text>
-            <Text style={{ marginTop: 10 }}>
-              You&apos;ll earn{" "}
-              <Text style={styles.reward}>
-                {selectedMarker?.reward?.sui} SUI
-              </Text>{" "}
-              and{" "}
-              <Text style={styles.badgeReward}>
-                {selectedMarker?.reward?.badge}
-              </Text>{" "}
-              when you completed this challenge!
-            </Text>
-
-            <Text style={{ marginTop: 10 }}>
-              You need to spend <Text style={styles.reward}>0.001 SUI</Text> to
-              join this challenge. Would you like to join this challenge?
-            </Text>
-
-            <View style={{ marginTop: 20 }}>
-              <Button title="Join challenge" onPress={() => alert("Joined!")} />
-              <Button
-                title="Cancel"
-                onPress={() => setSelectedMarker(null)}
-                color={"red"}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }

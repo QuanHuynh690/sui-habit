@@ -8,7 +8,7 @@ export interface Friend {
 }
 
 export interface JoinedChallenge extends Challenge {
-  progress: number;
+  progress?: number;
 }
 
 export interface CurrentUser {
