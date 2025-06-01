@@ -1,75 +1,128 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
+import Card from "@/components/card/Card";
+import { useCurrentUser } from "@/context/CurrentUserContext";
+import { useWeather } from "@/hooks/useWeather";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import CalendarStrip from "react-native-calendar-strip";
 export default function HomeScreen() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const currentUser = useCurrentUser();
+  const router = useRouter();
+  const onDateSelected = (date: any) => {
+    console.log("Selected date:", date.toISOString());
+    setSelectedDate(date);
+    // Tại đây bạn có thể gọi API để lấy dữ liệu thời tiết cho ngày được chọn
+  };
+  const lat = 10.8022;
+  const lon = 106.6565;
+  const { weather, loading } = useWeather(selectedDate, lat, lon);
+  console.log("weather", weather);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={{ flex: 1 }}>
+      <CalendarStrip
+        style={{
+          height: 100,
+          paddingTop: 30,
+          paddingBottom: 10,
+          marginHorizontal: -20,
+        }}
+        selectedDate={selectedDate}
+        onDateSelected={onDateSelected}
+        scrollable
+        daySelectionAnimation={{
+          type: "background",
+          duration: 200,
+          highlightColor: "#4ca2ff",
+        }}
+        dateNumberStyle={{ color: "black", fontSize: 20 }}
+        dateNameStyle={{ color: "#CDCDD0", fontSize: 10, fontWeight: "bold" }}
+        highlightDateNumberStyle={{ color: "#4ca2ff", fontSize: 20 }}
+        highlightDateNameStyle={{
+          color: "#4ca2ff",
+          fontSize: 10,
+          fontWeight: "bold",
+        }}
+        highlightDateContainerStyle={{ borderColor: "#4ca2ff" }}
+        iconLeft={null}
+        iconRight={null}
+        dayContainerStyle={{
+          borderRadius: 16,
+          height: 64,
+          backgroundColor: "#fff",
+          borderColor: "#EAECF0",
+          borderWidth: 2,
+        }}
+        dayComponentHeight={66}
+        calendarHeaderStyle={{ display: "none" }}
+      />
+      <View style={styles.challengeList}>
+        <View style={styles.sectionTitleCont}>
+          <Text style={styles.sectionTitle}>Challenges</Text>
+          <TouchableOpacity onPress={() => router.push("/challenge")}>
+            <Text style={styles.viewAll}>View all</Text>
+          </TouchableOpacity>
+        </View>
+        {currentUser?.currentUser?.joinedChallenges.map((challenge, index) => {
+          return (
+            <View key={index}>
+              <Card
+                title={challenge.name}
+                target={challenge.target}
+                progress={challenge.progress}
+                type={challenge.type}
+              />
+            </View>
+          );
+        })}
+      </View>
+
+      {/* <WalletConnect /> */}
+
+      {loading && <Text>Loading weather...</Text>}
+
+      {weather && (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 12,
+          }}
+        >
+          <Image
+            source={{
+              uri: `https://openweathermap.org/img/wn/${weather.icon}@2x.png`,
+            }}
+            style={{ width: 32, height: 32 }}
+          />
+          <Text style={{ marginLeft: 8 }}>
+            {weather.temp}°C – {weather.description}
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
-
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  challengeList: {
+    padding: 32,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  sectionTitleCont: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 5,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  sectionTitle: {
+    fontWeight: "bold",
+  },
+  viewAll: {
+    color: "#4ca2ff",
+    textTransform: "uppercase",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
